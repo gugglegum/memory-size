@@ -1,5 +1,5 @@
 {
-  "name": "gugglegum/memory-size-parser",
+  "name": "gugglegum/memory-size",
   "description": "Parser for human-friendly memory or file sizes",
   "type": "library",
   "keywords": ["parser", "file size", "memory size", "normalize", "recognize", "resolve"],
