@@ -12,7 +12,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "gugglegum\\MemorySizeParser\\": "src/"
+      "gugglegum\\MemorySize\\": "src/"
     }
   },
   "require": {
