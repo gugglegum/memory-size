@@ -1,0 +1,25 @@
+{
+  "name": "gugglegum/memory-size-parser",
+  "description": "Parser for human-friendly memory or file sizes",
+  "type": "library",
+  "keywords": ["parser", "file size", "memory size", "normalize", "recognize", "resolve"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Paul Melekhov",
+      "email": "gugglegum@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "gugglegum\\MemorySizeParser\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=7.0.0",
+    "gugglegum/abstract-entity": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "6.3"
+  }
+}
