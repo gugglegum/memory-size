@@ -32,7 +32,7 @@ class Parser
     /**
      * Parser options
      *
-     * @var Options
+     * @var ParserOptions
      */
     private $options;
 
@@ -46,7 +46,7 @@ class Parser
     {
         try {
             // Initialize options
-            $this->options = new Options($options);
+            $this->options = new ParserOptions($options);
 
             // If options "standards" not defined - set default list;
             if ($this->options->getAttribute('standards') === null) {
@@ -75,9 +75,9 @@ class Parser
     /**
      * Returns parser options instance
      *
-     * @return Options
+     * @return ParserOptions
      */
-    public function getOptions(): Options
+    public function getOptions(): ParserOptions
     {
         return $this->options;
     }
@@ -124,12 +124,12 @@ class Parser
     /**
      * Splits formatted size into number and unit of measure
      *
-     * @param string  $formattedSize
-     * @param Options $options
+     * @param string        $formattedSize
+     * @param ParserOptions $options
      * @return array
      * @throws Exception
      */
-    private function splitNumberAndUnit(string $formattedSize, Options $options): array
+    private function splitNumberAndUnit(string $formattedSize, ParserOptions $options): array
     {
         // Matches "12", "12.34" and if $allowNegativeSize "-23.45"
         $numberPattern = ($options->isAllowNegative() ? '-?' : '') . '\d+(?:\.\d+)?';
@@ -149,12 +149,12 @@ class Parser
     /**
      * Resolves unit of measure into multiplier
      *
-     * @param string  $unit
-     * @param Options $options
+     * @param string        $unit
+     * @param ParserOptions $options
      * @return float|int
      * @throws Exception
      */
-    private function resolveUnitToMultiplier(string $unit, Options $options)
+    private function resolveUnitToMultiplier(string $unit, ParserOptions $options)
     {
         if ($unit === '') {
             return 1;

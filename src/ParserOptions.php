@@ -12,7 +12,7 @@ use gugglegum\MemorySize\Standards\StandardInterface;
  *
  * @package gugglegum\MemorySize
  */
-class Options extends AbstractEntity
+class ParserOptions extends AbstractEntity
 {
     /**
      * @var StandardInterface[]|null
@@ -34,10 +34,10 @@ class Options extends AbstractEntity
 
     /**
      * @param StandardInterface[] $standards
-     * @return Options
+     * @return ParserOptions
      * @throws Exception
      */
-    public function setStandards(array $standards): Options
+    public function setStandards(array $standards): ParserOptions
     {
         foreach ($standards as $standard) {
             if (!$standard instanceof StandardInterface) {
@@ -58,9 +58,9 @@ class Options extends AbstractEntity
 
     /**
      * @param bool $allowNegative
-     * @return Options
+     * @return ParserOptions
      */
-    public function setAllowNegative(bool $allowNegative): Options
+    public function setAllowNegative(bool $allowNegative): ParserOptions
     {
         $this->allowNegative = $allowNegative;
         return $this;
