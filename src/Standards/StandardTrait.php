@@ -10,19 +10,16 @@ namespace gugglegum\MemorySize\Standards;
 trait StandardTrait
 {
     /**
-     * Returns measurement unit information
+     * Resolves unit of measure into multiplier
      *
-     * @param string $prefixedUnit
-     * @return array|bool
+     * @param string        $unit
+     * @return float|int|false
      */
-    public function getUnitInfo(string $prefixedUnit)
+    public function unitToMultiplier(string $unit)
     {
-        if (array_key_exists($prefixedUnit, static::$unitsInfo)) {
-            return [
-                'coefficient' => static::$unitsInfo[$prefixedUnit][0],
-                'base' => static::$unitsInfo[$prefixedUnit][1],
-                'exp' => static::$unitsInfo[$prefixedUnit][2],
-            ];
+        if (array_key_exists($unit, static::$unitsInfo)) {
+            list($coefficient, $base, $exp) = static::$unitsInfo[$unit];
+            return $coefficient * pow($base, $exp);
         } else {
             return false;
         }

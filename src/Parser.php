@@ -43,7 +43,7 @@ class Parser
             // Initialize options
             $this->options = new ParserOptions($options);
 
-            // If options "standards" not defined - set default list;
+            // If option "standards" not defined - set default list;
             if ($this->options->getAttribute('standards') === null) {
                 $this->options->setAttribute('standards', $this->getDefaultStandards());
             }
@@ -111,7 +111,7 @@ class Parser
             throw new Exception($e->getMessage(), $e->getCode());
         }
         $data = $this->splitNumberAndUnit($formattedSize, $options);
-        return $data['number'] * $this->resolveUnitToMultiplier($data['unit'], $options);
+        return $data['number'] * $this->unitToMultiplier($data['unit'], $options);
     }
 
     /**
@@ -140,21 +140,22 @@ class Parser
     }
 
     /**
-     * Resolves unit of measure into multiplier
+     * Resolves unit of measure into multiplier. This method actually iterates standards and calls its standard-specific
+     * unitToMultiplier().
      *
      * @param string        $unit
      * @param ParserOptions $options
      * @return float|int
      * @throws Exception
      */
-    private function resolveUnitToMultiplier(string $unit, ParserOptions $options)
+    private function unitToMultiplier(string $unit, ParserOptions $options)
     {
         if ($unit === '') {
             return 1;
         }
         foreach ($options->getStandards() as $standard) {
-            if (($unitInfo = $standard->getUnitInfo($unit)) !== false) {
-                return $unitInfo['coefficient'] * pow($unitInfo['base'], $unitInfo['exp']);
+            if (($multiplier = $standard->unitToMultiplier($unit)) !== false) {
+                return $multiplier;
             }
         }
         throw new Exception("Failed to recognize information measurement unit \"{$unit}\"");

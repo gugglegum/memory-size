@@ -10,11 +10,11 @@ namespace gugglegum\MemorySize\Standards;
 interface StandardInterface
 {
     /**
-     * Returns measurement unit information
+     * Resolves unit of measure into multiplier
      *
-     * @param string $prefixedUnit
-     * @return array|bool
+     * @param string        $unit
+     * @return float|int|false
      */
-    public function getUnitInfo(string $prefixedUnit);
+    public function unitToMultiplier(string $unit);
 
 }
