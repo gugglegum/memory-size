@@ -44,26 +44,6 @@ class ParserTest extends TestCase
         $this->assertEquals(62 * pow(1024, 8), $parser->parse('62 YiB'));
     }
 
-    public function testSiFormats()
-    {
-        $parser = new \gugglegum\MemorySize\Parser([
-            'standards' => [
-                new \gugglegum\MemorySize\Standards\Common(),
-                new \gugglegum\MemorySize\Standards\SI(),
-                new \gugglegum\MemorySize\Standards\JEDEC(),
-                new \gugglegum\MemorySize\Standards\IEC(),
-            ],
-        ]);
-        $this->assertEquals(64 * 1000, $parser->parse('64 kB'));
-        $this->assertEquals(32 * pow(1000, 2), $parser->parse('32MB'));
-        $this->assertEquals(32 * pow(1000, 3), $parser->parse('32 GB'));
-        $this->assertEquals(2  * pow(1000, 4), $parser->parse('2 TB'));
-        $this->assertEquals(10.5 * pow(1000, 5), $parser->parse('10.5 PB'));
-        $this->assertEquals(12 * pow(1000, 6), $parser->parse('12 EB'));
-        $this->assertEquals(34 * pow(1000, 7), $parser->parse('34 ZB'));
-        $this->assertEquals(62 * pow(1000, 8), $parser->parse('62 YB'));
-    }
-
     public function testSetOptions()
     {
         $parser = new \gugglegum\MemorySize\Parser();
@@ -73,7 +53,7 @@ class ParserTest extends TestCase
 
         $parser->setOptions([
             'standards' => [
-                new \gugglegum\MemorySize\Standards\SI(),
+                new \gugglegum\MemorySize\Standards\IEC(),
             ],
         ]);
         $this->assertEquals(32 * pow(1000, 2), $parser->parse('32MB'));
@@ -89,7 +69,7 @@ class ParserTest extends TestCase
 
         $overrideOptions = [
             'standards' => [
-                new \gugglegum\MemorySize\Standards\SI(),
+                new \gugglegum\MemorySize\Standards\IEC(),
             ],
         ];
         $this->assertEquals(32 * pow(1000, 2), $parser->parse('32MB', $overrideOptions));

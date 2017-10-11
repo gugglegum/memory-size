@@ -4,21 +4,16 @@ declare(strict_types=1);
 
 namespace gugglegum\MemorySize;
 
-use gugglegum\MemorySize\Standards\Common;
 use gugglegum\MemorySize\Standards\IEC;
 use gugglegum\MemorySize\Standards\JEDEC;
-use gugglegum\MemorySize\Standards\SI;
 use gugglegum\MemorySize\Standards\StandardInterface;
 
 /**
  * Parses file or memory size in human-friendly format (like "1.44 MB" or "4.38 GiB) and returns normalized size in
  * bytes. Supports 4 primary information size measurement standards:
  *
- *   - Common (not a standard actually, just a trick to parse simple units without prefixes like "128 B" (128 bytes)
- *     or "16 b" (16 bits) in a common way
- *   - JEDEC Standard 100B.01 (Binary "K" or "KB", "M" or "MB", "G" or "GB", "Kbit", "Mbit", "Gbit")
+ *   - JEDEC Standard 100B.01 (Binary "K" or "KB", "M" or "MB", "G" or "GB", "Kb", "Kbit", "Mb", "Mbit", "Gb", "Gbit")
  *   - ISO/IEC 80000 (Binary "KiB", "MiB", "GiB", "TiB", etc. Also "Kibit", "Mibit", "Gibit", etc.)
- *   - SI Standard (Decimal "kB", "MB", "GB", etc.)
  *
  * JEDEC and SI partially conflicts because "1MB" in JEDEC is 1048576 bytes, but in SI "1MB" is 1000000 bytes. Due to
  * historical reasons JEDEC standard has higher priority than SI. But you may change this behaviour if you need it.
@@ -65,10 +60,8 @@ class Parser
     public function getDefaultStandards()
     {
         return [
-            new Common(),
             new JEDEC(),
             new IEC(),
-            new SI(),
         ];
     }
 
