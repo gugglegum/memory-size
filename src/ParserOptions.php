@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace gugglegum\MemorySize;
 
-use gugglegum\AbstractEntity\AbstractEntity;
 use gugglegum\MemorySize\Standards\StandardInterface;
 
 /**
@@ -12,7 +11,7 @@ use gugglegum\MemorySize\Standards\StandardInterface;
  *
  * @package gugglegum\MemorySize
  */
-class ParserOptions extends AbstractEntity
+class ParserOptions
 {
     /**
      * @var StandardInterface[]|null
@@ -23,6 +22,39 @@ class ParserOptions extends AbstractEntity
      * @var bool
      */
     private $allowNegative = true;
+
+    /**
+     * Constructor allows to initialize attribute values
+     *
+     * @param array $data           Associative array with [attribute => value] pairs
+     * @throws Exception
+     */
+    public function __construct(array $data = [])
+    {
+        $this->setFromArray($data);
+    }
+
+    /**
+     * Initializes the model by values from associative array. Only attributes corresponding to passed keys will be set.
+     *
+     * @param array $data Associative array with [attribute => value] pairs
+     * @return self
+     * @throws Exception
+     */
+    public function setFromArray(array $data): self
+    {
+        foreach ($data as $k => $v) {
+            switch ($k) {
+                case 'standards' :
+                    $this->setStandards($v);
+                    break;
+                case 'allowNegative' :
+                    $this->setAllowNegative($v);
+                    break;
+            }
+        }
+        return $this;
+    }
 
     /**
      * @return StandardInterface[]|null

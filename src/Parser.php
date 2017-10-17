@@ -39,16 +39,12 @@ class Parser
      */
     public function __construct(array $options = [])
     {
-        try {
-            // Initialize options
-            $this->options = new ParserOptions($options);
+        // Initialize options
+        $this->options = new ParserOptions($options);
 
-            // If option "standards" not defined - set default list;
-            if ($this->options->getAttribute('standards') === null) {
-                $this->options->setAttribute('standards', $this->getDefaultStandards());
-            }
-        } catch (\gugglegum\AbstractEntity\Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+        // If option "standards" not defined - set default list;
+        if ($this->options->getStandards() === null) {
+            $this->options->setStandards($this->getDefaultStandards());
         }
     }
 
@@ -83,11 +79,7 @@ class Parser
      */
     public function setOptions(array $options)
     {
-        try {
-            $this->options->setFromArray($options);
-        } catch (\gugglegum\AbstractEntity\Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
-        }
+        $this->options->setFromArray($options);
     }
 
     /**
@@ -100,15 +92,11 @@ class Parser
      */
     public function parse(string $formattedSize, array $overrideOptions = [])
     {
-        try {
-            if (!empty($overrideOptions)) {
-                $options = clone $this->options;
-                $options->setFromArray($overrideOptions);
-            } else {
-                $options = $this->options;
-            }
-        } catch (\gugglegum\AbstractEntity\Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+        if (!empty($overrideOptions)) {
+            $options = clone $this->options;
+            $options->setFromArray($overrideOptions);
+        } else {
+            $options = $this->options;
         }
         $data = $this->splitNumberAndUnit($formattedSize, $options);
         return $data['number'] * $this->unitToMultiplier($data['unit'], $options);
