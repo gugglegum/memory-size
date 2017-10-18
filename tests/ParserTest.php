@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
@@ -107,6 +108,4 @@ class ParserTest extends TestCase
 
         $parser->parse('10 mb');
     }
-
-
 }

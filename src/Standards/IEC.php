@@ -65,4 +65,10 @@ class IEC implements StandardInterface
         'Ybit' => [1/8, 1000, 8], // Yottabit (1000^8 bits)
     ];
 
+    /**
+     * Array of measurement units used in formatting
+     *
+     * @var array
+     */
+    protected static $byteUnits = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
 }
