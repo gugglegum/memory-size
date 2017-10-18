@@ -21,7 +21,7 @@ class JEDEC implements StandardInterface
      * @var array
      */
     protected static $unitsInfo = [
-        'B' => [1, 1, 1],     // Byte
+        'B' =>  [1, 1, 1],    // Byte
         'K' =>  [1, 1024, 1], // Kibibyte (1024^1 bytes)
         'KB' => [1, 1024, 1], // Kibibyte (1024^1 bytes)
         'M' =>  [1, 1024, 2], // Mebibyte (1024^2 bytes)
@@ -29,12 +29,19 @@ class JEDEC implements StandardInterface
         'G' =>  [1, 1024, 3], // Gibibyte (1024^3 bytes)
         'GB' => [1, 1024, 3], // Gibibyte (1024^3 bytes)
 
-        'b' => [1/8, 1, 1],       // bit
-        'Kb' => [1/8, 1024, 1],   // Kibibit (1024^1 bits)
+        'b' =>    [1/8, 1, 1],    // bit
+        'Kb' =>   [1/8, 1024, 1], // Kibibit (1024^1 bits)
         'Kbit' => [1/8, 1024, 1], // Kibibit (1024^1 bits)
-        'Mb' => [1/8, 1024, 2],   // Mebibit (1024^2 bits)
+        'Mb' =>   [1/8, 1024, 2], // Mebibit (1024^2 bits)
         'Mbit' => [1/8, 1024, 2], // Mebibit (1024^2 bits)
-        'Gb' => [1/8, 1024, 3],   // Gibibit (1024^3 bits)
+        'Gb' =>   [1/8, 1024, 3], // Gibibit (1024^3 bits)
         'Gbit' => [1/8, 1024, 3], // Gibibit (1024^3 bits)
     ];
+
+    /**
+     * Array of measurement units used in formatting
+     *
+     * @var array
+     */
+    protected static $byteUnits = ['B', 'KB', 'MB', 'GB'];
 }
