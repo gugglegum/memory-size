@@ -51,6 +51,8 @@ class ParserOptions
                 case 'allowNegative' :
                     $this->setAllowNegative($v);
                     break;
+                default :
+                    throw new Exception("Unknown memory-size parser options \"{$k}\"");
             }
         }
         return $this;
