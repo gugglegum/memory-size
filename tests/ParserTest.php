@@ -19,7 +19,12 @@ class ParserTest extends TestCase
 
     public function testJedecFormats()
     {
-        $parser = new \gugglegum\MemorySize\Parser();
+        $parser = new \gugglegum\MemorySize\Parser([
+            'standards' => [
+                new \gugglegum\MemorySize\Standards\JEDEC(),
+                new \gugglegum\MemorySize\Standards\IEC(),
+            ],
+        ]);
         $this->assertEquals(65536, $parser->parse('64K'));
         $this->assertEquals(32768, $parser->parse('32KB'));
         $this->assertEquals(32768, $parser->parse('32   KB'));
@@ -49,38 +54,38 @@ class ParserTest extends TestCase
     {
         $parser = new \gugglegum\MemorySize\Parser();
 
-        $this->assertEquals(32 * pow(1024, 2), $parser->parse('32MB'));
-        $this->assertEquals(32 * pow(1024, 3), $parser->parse('32GB'));
+        $this->assertEquals(32 * pow(1000, 2), $parser->parse('32MB'));
+        $this->assertEquals(32 * pow(1000, 3), $parser->parse('32GB'));
 
         $parser->setOptions([
             'standards' => [
-                new \gugglegum\MemorySize\Standards\IEC(),
+                new \gugglegum\MemorySize\Standards\JEDEC(),
             ],
         ]);
-        $this->assertEquals(32 * pow(1000, 2), $parser->parse('32MB'));
-        $this->assertEquals(32 * pow(1000, 3), $parser->parse('32GB'));
+        $this->assertEquals(32 * pow(1024, 2), $parser->parse('32MB'));
+        $this->assertEquals(32 * pow(1024, 3), $parser->parse('32GB'));
     }
 
     public function testOverrideOptions()
     {
         $parser = new \gugglegum\MemorySize\Parser();
 
-        $this->assertEquals(32 * pow(1024, 2), $parser->parse('32MB'));
-        $this->assertEquals(32 * pow(1024, 3), $parser->parse('32GB'));
+        $this->assertEquals(32 * pow(1000, 2), $parser->parse('32MB'));
+        $this->assertEquals(32 * pow(1000, 3), $parser->parse('32GB'));
 
         $overrideOptions = [
             'standards' => [
-                new \gugglegum\MemorySize\Standards\IEC(),
+                new \gugglegum\MemorySize\Standards\JEDEC(),
             ],
         ];
-        $this->assertEquals(32 * pow(1000, 2), $parser->parse('32MB', $overrideOptions));
-        $this->assertEquals(32 * pow(1000, 3), $parser->parse('32GB', $overrideOptions));
+        $this->assertEquals(32 * pow(1024, 2), $parser->parse('32MB', $overrideOptions));
+        $this->assertEquals(32 * pow(1024, 3), $parser->parse('32GB', $overrideOptions));
     }
 
     public function testParseException_Negative()
     {
         $parser = new \gugglegum\MemorySize\Parser();
-        $this->assertEquals(-32 * pow(1024, 2), $parser->parse('-32MB'));
+        $this->assertEquals(-32 * pow(1000, 2), $parser->parse('-32MB'));
 
         $parser->getOptions()->setAllowNegative(false);
 

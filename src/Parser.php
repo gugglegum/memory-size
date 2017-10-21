@@ -56,8 +56,8 @@ class Parser
     public function getDefaultStandards()
     {
         return [
-            new JEDEC(),
             new IEC(),
+            new JEDEC(),
         ];
     }
 
