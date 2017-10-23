@@ -152,14 +152,14 @@ class FormatterTest extends TestCase
     public function testExceptionOnUnknownOption1()
     {
         $this->expectException(\gugglegum\MemorySize\Exception::class);
-        $this->expectExceptionMessage('Unknown memory-size formatter options "unknownOption"');
+        $this->expectExceptionMessage('Unknown memory-size formatter option "unknownOption"');
         new \gugglegum\MemorySize\Formatter(['unknownOption' => 'value']);
     }
 
     public function testExceptionOnUnknownOption2()
     {
         $this->expectException(\gugglegum\MemorySize\Exception::class);
-        $this->expectExceptionMessage('Unknown memory-size formatter options "unknownOption"');
+        $this->expectExceptionMessage('Unknown memory-size formatter option "unknownOption"');
         $formatter = new \gugglegum\MemorySize\Formatter();
         $formatter->setOptions(['unknownOption' => 'value']);
     }

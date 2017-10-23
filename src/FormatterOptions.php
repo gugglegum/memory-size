@@ -99,7 +99,7 @@ class FormatterOptions
                     $this->setUnitSeparator($v);
                     break;
                 default :
-                    throw new Exception("Unknown memory-size formatter options \"{$k}\"");
+                    throw new Exception("Unknown memory-size formatter option \"{$k}\"");
             }
         }
         return $this;

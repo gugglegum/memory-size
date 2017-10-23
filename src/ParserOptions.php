@@ -52,7 +52,7 @@ class ParserOptions
                     $this->setAllowNegative($v);
                     break;
                 default :
-                    throw new Exception("Unknown memory-size parser options \"{$k}\"");
+                    throw new Exception("Unknown memory-size parser option \"{$k}\"");
             }
         }
         return $this;
