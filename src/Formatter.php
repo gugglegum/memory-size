@@ -7,6 +7,11 @@ namespace gugglegum\MemorySize;
 use gugglegum\MemorySize\Standards\IEC;
 use gugglegum\MemorySize\Standards\StandardInterface;
 
+/**
+ * Formats memory sizes in human-friendly view
+ *
+ * @package gugglegum\MemorySize
+ */
 class Formatter
 {
     /**
@@ -20,17 +25,12 @@ class Formatter
      * Parser constructor
      *
      * @param array $options    OPTIONAL associative array of options to override defaults
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $options = [])
     {
         // Initialize options
         $this->options = new FormatterOptions($options);
-
-        // If option "standard" not defined - set default;
-        if ($this->options->getStandard() === null) {
-            $this->options->setStandard($this->getDefaultStandard());
-        }
     }
 
     /**
@@ -38,7 +38,7 @@ class Formatter
      *
      * @return StandardInterface
      */
-    public function getDefaultStandard(): StandardInterface
+    public static function getDefaultStandard(): StandardInterface
     {
         return new IEC();
     }
@@ -47,9 +47,10 @@ class Formatter
      * Formats size of memory or file
      *
      * @param int|float $size Size in bytes
-     * @param array     $overrideOptions
+     * @param array $overrideOptions Formatter options to override (only for one time)
      * @return string
      * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function format($size, array $overrideOptions = []): string
     {
@@ -59,6 +60,7 @@ class Formatter
         } else {
             $options = $this->options;
         }
+        $options->lazyInitialization();
 
         $standard = $options->getStandard();
         $multipliers = $standard->getByteUnitMultipliers();
@@ -74,17 +76,29 @@ class Formatter
                 $bestUnit = $unit;
             }
         }
+
+        if ($bestValue === null || $bestUnit === null) {
+            throw new Exception("Failed to format memory size {$size}");
+        }
+
         return $this->formatNumber($bestValue, $options) . $options->getUnitSeparator() . $bestUnit;
     }
 
     /**
-     * @param int|float        $number
+     * Formats a number representing size value
+     *
+     * @param int|float $number
      * @param FormatterOptions $options
-     * @return bool|string
+     * @return string
      */
     private function formatNumber($number, FormatterOptions $options)
     {
-        $formattedNumber = number_format($number, $options->getMaxDecimals(), $options->getDecimalPoint(), $options->getThousandsSeparator());
+        $formattedNumber = number_format(
+            $number,
+            $options->getMaxDecimals(),
+            $options->getNumberFormat()->getDecimalPoint(),
+            $options->getNumberFormat()->getThousandsSeparator()
+        );
 
         $formattedNumberLength = strlen($formattedNumber);
         $stripMaxTrailingZeros = $options->getMaxDecimals() - $options->getMinDecimals();
@@ -92,10 +106,10 @@ class Formatter
         while ($formattedNumber{$formattedNumberLength - $i - 1} === '0' && $i < $stripMaxTrailingZeros) {
             $i++;
         }
-        if ($formattedNumber{$formattedNumberLength - $i - 1} === $options->getDecimalPoint()) {
+        if ($formattedNumber{$formattedNumberLength - $i - 1} === $options->getNumberFormat()->getDecimalPoint()) {
             $i++;
         }
-        return substr($formattedNumber, 0, $formattedNumberLength - $i);
+        return (string) substr($formattedNumber, 0, $formattedNumberLength - $i);
     }
 
     /**
@@ -112,7 +126,7 @@ class Formatter
      * Set options from associative array
      *
      * @param array $options
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function setOptions(array $options)
     {

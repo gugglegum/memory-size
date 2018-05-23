@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace gugglegum\MemorySize;
 
 /**
- * Parser exception
+ * Parser or formatter exception
  *
  * @package gugglegum\MemorySize
  */

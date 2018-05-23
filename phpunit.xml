@@ -1,7 +1,10 @@
 <phpunit bootstrap="vendor/autoload.php">
   <testsuites>
     <testsuite name="parser">
-      <directory>tests</directory>
+      <file>tests/ParserTest.php</file>
+    </testsuite>
+    <testsuite name="formatter">
+      <file>tests/FormatterTest.php</file>
     </testsuite>
   </testsuites>
 </phpunit>

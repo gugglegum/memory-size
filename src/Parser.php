@@ -35,17 +35,12 @@ class Parser
      * Parser constructor
      *
      * @param array $options    OPTIONAL associative array of options to override defaults
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $options = [])
     {
         // Initialize options
         $this->options = new ParserOptions($options);
-
-        // If option "standards" not defined - set default list;
-        if ($this->options->getStandards() === null) {
-            $this->options->setStandards($this->getDefaultStandards());
-        }
     }
 
     /**
@@ -53,7 +48,7 @@ class Parser
      *
      * @return StandardInterface[]
      */
-    public function getDefaultStandards()
+    public static function getDefaultStandards()
     {
         return [
             new IEC(),
@@ -75,7 +70,7 @@ class Parser
      * Set options from associative array
      *
      * @param array $options
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function setOptions(array $options)
     {
@@ -89,6 +84,7 @@ class Parser
      * @param array  $overrideOptions
      * @return float|int
      * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function parse(string $formattedSize, array $overrideOptions = [])
     {
@@ -98,6 +94,8 @@ class Parser
         } else {
             $options = $this->options;
         }
+        $options->lazyInitialization();
+
         $data = $this->splitNumberAndUnit($formattedSize, $options);
         return $data['number'] * $this->unitToMultiplier($data['unit'], $options);
     }
@@ -112,24 +110,50 @@ class Parser
      */
     private function splitNumberAndUnit(string $formattedSize, ParserOptions $options): array
     {
-        // Matches "12", "12.34" and if $allowNegativeSize "-23.45"
-        $numberPattern = ($options->isAllowNegative() ? '-?' : '') . '\d+(?:\.\d+)?';
+        $numberFormats = $options->getNumberFormats();
+        $numberFormatSubPatterns = [];
+        foreach ($numberFormats as $numberFormat) {
+            $numberFormatSubPatterns[] = ($options->isAllowNegative() ? '-?' : '') . '\d{1,3}(?:' . preg_quote($numberFormat->getThousandsSeparator()) . '\d{3})*(?:' . preg_quote($numberFormat->getDecimalPoint()) . '\d+)?';
+        }
+        $numberPattern = '(?:' . implode('|', $numberFormatSubPatterns) . ')';
         // Matches "KB", "MiB", etc.
         $unitPattern = "[a-z]+";
         // Matches "1.44 MiB", "4.7GB"
         if (preg_match("/^({$numberPattern})\s*({$unitPattern})?$/i", $formattedSize, $m)) {
+
+            // Recognize the number and convert it to standard simple form ("12 345,67" => "12345.67")
+            $numberParsed = false;
+            for ($i = 0; $i < count($numberFormatSubPatterns); $i++) {
+                if (preg_match('/^' . $numberFormatSubPatterns[$i] . '$/', $m[1])) {
+                    $m[1] = str_replace([
+                        $numberFormats[$i]->getDecimalPoint(),
+                        $numberFormats[$i]->getThousandsSeparator(),
+                    ], [
+                        '.',
+                        '',
+                    ], $m[1]);
+                    $numberParsed = true;
+                }
+            }
+
+            if (!$numberParsed) {
+                // This exception actually should never be thrown since we can enter this branch only if regular
+                // expression with all number formats are matched.
+                throw new Exception("Can't parse number \"{$m[1]}\" (impossible exception)");
+            }
+
             return [
                 'number' => $m[1],
                 'unit' => isset($m[2]) ? $m[2] : '',
             ];
         } else {
-            throw new Exception('Failed to parse formatted memory size');
+            throw new Exception('Failed to parse formatted memory size ("' . $formattedSize . '")');
         }
     }
 
     /**
      * Resolves unit of measure into multiplier. This method actually iterates standards and calls its standard-specific
-     * unitToMultiplier().
+     * unitToMultiplier(). Usually it returns such values as 1, 1000, 1024, 1000000, 1048576 and so on.
      *
      * @param string        $unit
      * @param ParserOptions $options

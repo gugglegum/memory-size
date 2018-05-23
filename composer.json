@@ -1,8 +1,8 @@
 {
   "name": "gugglegum/memory-size",
-  "description": "Parser for human-friendly memory or file sizes",
+  "description": "Parser and formatter for human-friendly memory or file sizes based on standards",
   "type": "library",
-  "keywords": ["parser", "file size", "memory size", "normalize", "recognize", "resolve"],
+  "keywords": ["parser", "formatter", "file size", "memory size", "normalize", "recognize", "resolve"],
   "license": "MIT",
   "authors": [
     {
@@ -16,7 +16,7 @@
     }
   },
   "require": {
-    "php": ">=7.0.0"
+    "php": "^7.1"
   },
   "require-dev": {
     "phpunit/phpunit": "6.3"

@@ -35,18 +35,11 @@ class FormatterOptions
     private $maxDecimals = 2;
 
     /**
-     * Decimal point that splits integer and fractional parts
+     * Decimal point (usually "." or ",") & thousands separator (usually none or "," or " ")
      *
-     * @var string
+     * @var NumberFormat
      */
-    private $decimalPoint = '.';
-
-    /**
-     * Separator for thousands, millions, billions, trillions, etc.
-     *
-     * @var string
-     */
-    private $thousandsSeparator = '';
+    private $numberFormat;
 
     /**
      * Separator between number and measurement unit. Usually space (" ") or empty ("")
@@ -59,7 +52,7 @@ class FormatterOptions
      * Constructor allows to initialize attribute values
      *
      * @param array $data           Associative array with [attribute => value] pairs
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $data = [])
     {
@@ -67,11 +60,27 @@ class FormatterOptions
     }
 
     /**
+     * Lazy initialization with default values for required options which are undefined
+     */
+    public function lazyInitialization()
+    {
+        // If option "standard" not defined - set default
+        if ($this->getStandard() === null) {
+            $this->setStandard(Formatter::getDefaultStandard());
+        }
+
+        // If option "numberFormat" not defined - set default
+        if (!$this->hasNumberFormat()) {
+            $this->setNumberFormat(NumberFormat::createDefault());
+        }
+    }
+
+    /**
      * Initializes the model by values from associative array. Only attributes corresponding to passed keys will be set.
      *
      * @param array $data Associative array with [attribute => value] pairs
      * @return self
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function setFromArray(array $data): self
     {
@@ -89,34 +98,34 @@ class FormatterOptions
                 case 'fixedDecimals' :
                     $this->setFixedDecimals($v);
                     break;
-                case 'decimalPoint' :
-                    $this->setDecimalPoint($v);
-                    break;
-                case 'thousandsSeparator' :
-                    $this->setThousandsSeparator($v);
+                case 'numberFormat' :
+                    $this->setNumberFormat($v);
                     break;
                 case 'unitSeparator' :
                     $this->setUnitSeparator($v);
                     break;
                 default :
-                    throw new Exception("Unknown memory-size formatter option \"{$k}\"");
+                    throw new \InvalidArgumentException("Unknown memory-size formatter option \"{$k}\"");
             }
         }
         return $this;
     }
 
     /**
+     * Returns currently defined standard or null if undefined
+     *
      * @return StandardInterface|null
      */
-    public function getStandard()
+    public function getStandard(): ?StandardInterface
     {
         return $this->standard;
     }
 
     /**
+     * Sets standard to use in formatter
+     *
      * @param StandardInterface $standard
      * @return FormatterOptions
-     * @throws Exception
      */
     public function setStandard(StandardInterface $standard): FormatterOptions
     {
@@ -125,6 +134,8 @@ class FormatterOptions
     }
 
     /**
+     * Returns currently defined minimum amount of decimals (default is: 0)
+     *
      * @return int
      */
     public function getMinDecimals(): int
@@ -133,6 +144,8 @@ class FormatterOptions
     }
 
     /**
+     * Sets minimum amount of decimals
+     *
      * @param int $minDecimals
      * @return FormatterOptions
      */
@@ -143,6 +156,8 @@ class FormatterOptions
     }
 
     /**
+     * Returns currently defined maximal amount of decimals (default is: 2)
+     *
      * @return int
      */
     public function getMaxDecimals(): int
@@ -151,6 +166,8 @@ class FormatterOptions
     }
 
     /**
+     * Sets maximal amount of decimals
+     *
      * @param int $maxDecimals
      * @return FormatterOptions
      */
@@ -175,42 +192,47 @@ class FormatterOptions
     }
 
     /**
-     * @return string
+     * Whether number format is defined or not
+     *
+     * @return bool
      */
-    public function getDecimalPoint(): string
+    public function hasNumberFormat(): bool
     {
-        return $this->decimalPoint;
+        return $this->numberFormat !== null;
     }
 
     /**
-     * @param string $decimalPoint
-     * @return FormatterOptions
+     * Returns currently defined number format or null if undefined
+     *
+     * @return null|NumberFormat
      */
-    public function setDecimalPoint(string $decimalPoint): FormatterOptions
+    public function getNumberFormat(): ?NumberFormat
     {
-        $this->decimalPoint = $decimalPoint;
+        return $this->numberFormat;
+    }
+
+    /**
+     * Set number format definition
+     *
+     * @param NumberFormat|array $numberFormat
+     * @return FormatterOptions
+     * @throws \InvalidArgumentException
+     */
+    public function setNumberFormat($numberFormat): FormatterOptions
+    {
+        if ($numberFormat instanceof NumberFormat) {
+            $this->numberFormat = $numberFormat;
+        } elseif (is_array($numberFormat)) {
+            $this->numberFormat = NumberFormat::fromArray($numberFormat);
+        } else {
+            throw new \InvalidArgumentException('Invalid argument type in ' . __METHOD__);
+        }
         return $this;
     }
 
     /**
-     * @return string
-     */
-    public function getThousandsSeparator(): string
-    {
-        return $this->thousandsSeparator;
-    }
-
-    /**
-     * @param string $thousandsSeparator
-     * @return FormatterOptions
-     */
-    public function setThousandsSeparator(string $thousandsSeparator): FormatterOptions
-    {
-        $this->thousandsSeparator = $thousandsSeparator;
-        return $this;
-    }
-
-    /**
+     * Returns currently defined separator between number and measurement unit (default is " ")
+     *
      * @return string
      */
     public function getUnitSeparator(): string
@@ -219,6 +241,8 @@ class FormatterOptions
     }
 
     /**
+     * Sets separator between number and measurement unit
+     *
      * @param string $unitSeparator
      * @return FormatterOptions
      */

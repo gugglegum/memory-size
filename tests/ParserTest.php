@@ -113,4 +113,69 @@ class ParserTest extends TestCase
 
         $parser->parse('10 mb');
     }
+
+    /**
+     * @throws \gugglegum\MemorySize\Exception
+     */
+    public function testParseWithNumberFormats1()
+    {
+        $parser = new \gugglegum\MemorySize\Parser([
+            'numberFormats' => [
+                [
+                    'decimalPoint' => ',',
+                    'thousandsSeparator' => ' ',
+                ],
+            ],
+        ]);
+        $this->assertEquals(1536680, $parser->parse('1 536,68 kB'));
+
+        $this->expectException(\gugglegum\MemorySize\Exception::class);
+        $this->expectExceptionMessage('Failed to parse formatted memory size ("1536.68 kB")');
+        $parser->parse('1536.68 kB');
+    }
+
+    /**
+     * @throws \gugglegum\MemorySize\Exception
+     */
+    public function testParseWithNumberFormats2()
+    {
+        $parser = new \gugglegum\MemorySize\Parser();
+        $parser->getOptions()->setNumberFormats([
+            \gugglegum\MemorySize\NumberFormat::create(',', ' '),
+            \gugglegum\MemorySize\NumberFormat::create('.', ','),
+        ]);
+        $this->assertEquals(1536680, $parser->parse('1 536,68 kB'));
+        $this->assertEquals(1536680, $parser->parse('1,536.68 kB'));
+    }
+
+    /**
+     * @throws \gugglegum\MemorySize\Exception
+     */
+    public function testParseWithNumberFormats3()
+    {
+        $parser = new \gugglegum\MemorySize\Parser();
+        $parser->getOptions()->setNumberFormats([
+            \gugglegum\MemorySize\NumberFormat::create(',', ' '),
+        ]);
+
+        $this->assertEquals(1536680, $parser->parse('1 536,68 kB'));
+
+        $this->expectException(\gugglegum\MemorySize\Exception::class);
+        $this->expectExceptionMessage('Failed to parse formatted memory size ("1536.68 kB")');
+        $parser->parse('1536.68 kB');
+    }
+
+
+    /**
+     * @throws \gugglegum\MemorySize\Exception
+     */
+    public function testParseWithEmptyStandards()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Passed empty array of standards in gugglegum\MemorySize\ParserOptions::setStandards');
+
+        new \gugglegum\MemorySize\Parser([
+            'standards' => [],
+        ]);
+    }
 }

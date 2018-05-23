@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use gugglegum\MemorySize\Formatter;
+use gugglegum\MemorySize\NumberFormat;
+use gugglegum\MemorySize\Standards\IEC;
+use gugglegum\MemorySize\Standards\JEDEC;
 use PHPUnit\Framework\TestCase;
 
 class FormatterTest extends TestCase
@@ -9,7 +13,7 @@ class FormatterTest extends TestCase
     public function testIecStandard()
     {
         // IEC standard is default, so we don't need to pass it as option
-        $formatter = new \gugglegum\MemorySize\Formatter();
+        $formatter = new Formatter();
 
         $this->assertEquals('64 KiB', $formatter->format(65536));
         $this->assertEquals('512 B', $formatter->format(512));
@@ -23,8 +27,8 @@ class FormatterTest extends TestCase
 
     public function testJedecStandard()
     {
-        $formatter = new \gugglegum\MemorySize\Formatter([
-            'standard' => new \gugglegum\MemorySize\Standards\JEDEC(),
+        $formatter = new Formatter([
+            'standard' => new JEDEC(),
         ]);
 
         $this->assertEquals('64 KB', $formatter->format(65536));
@@ -39,7 +43,7 @@ class FormatterTest extends TestCase
 
     public function testMaxDecimals()
     {
-        $formatter = new \gugglegum\MemorySize\Formatter([
+        $formatter = new Formatter([
             'maxDecimals' => 3,
         ]);
         // test maxDecimals passed through constructor
@@ -59,21 +63,21 @@ class FormatterTest extends TestCase
 
     public function testMinDecimals()
     {
-        $formatter = new \gugglegum\MemorySize\Formatter();
+        $formatter = new Formatter();
         $this->assertEquals('1.0 MiB', $formatter->format(1048576, ['minDecimals' => 1])); // DVD-R(W)
         $this->assertEquals('1.50 GiB', $formatter->format(1610612736, ['minDecimals' => 2])); // DVD+R(W)
     }
 
     public function testFixedDecimals()
     {
-        $formatter = new \gugglegum\MemorySize\Formatter();
+        $formatter = new Formatter();
         $this->assertEquals('1.000 MiB', $formatter->format(1048576, ['fixedDecimals' => 3])); // DVD-R(W)
         $this->assertEquals('2 GiB', $formatter->format(1610612736, ['fixedDecimals' => 0])); // DVD+R(W)
     }
 
     public function testDecimalPoint()
     {
-        $formatter = new \gugglegum\MemorySize\Formatter(['decimalPoint' => ',']);
+        $formatter = new Formatter(['numberFormat' => ['decimalPoint' => ',']]);
         $this->assertEquals('1,21 KiB', $formatter->format(1234));
     }
 
@@ -81,23 +85,23 @@ class FormatterTest extends TestCase
     {
         // We use JEDEC standard to test thousands separator because JEDEC supports only GB as maximum unit. IEC
         // supports TiB, PiB, etc.
-        $formatter = new \gugglegum\MemorySize\Formatter([
-            'standard' => new \gugglegum\MemorySize\Standards\JEDEC(),
+        $formatter = new Formatter([
+            'standard' => new JEDEC(),
         ]);
         // No thousands separator -- default
         $this->assertEquals('4384.03 GB', $formatter->format(4707319808000)); // 1000 x DVD-R(W)
 
         // With space (" ") thousands separator using setOptions()
-        $formatter->setOptions(['thousandsSeparator' => ' ']);
+        $formatter->setOptions(['numberFormat' => ['thousandsSeparator' => ' ']]);
         $this->assertEquals('4 384.03 GB', $formatter->format(4707319808000)); // 1000 x DVD-R(W)
 
         // With comma (",") thousands separator using override options
-        $this->assertEquals('4,384.03 GB', $formatter->format(4707319808000, ['thousandsSeparator' => ','])); // 1000 x DVD-R(W)
+        $this->assertEquals('4,384.03 GB', $formatter->format(4707319808000, ['numberFormat' => ['thousandsSeparator' => ',']])); // 1000 x DVD-R(W)
     }
 
     public function testUnitSeparator()
     {
-        $formatter = new \gugglegum\MemorySize\Formatter(['unitSeparator' => '']);
+        $formatter = new Formatter(['unitSeparator' => '']);
         $this->assertEquals('1.21KiB', $formatter->format(1234));
         $formatter->getOptions()->setUnitSeparator(' ');
         $this->assertEquals('1.21 KiB', $formatter->format(1234));
@@ -106,7 +110,7 @@ class FormatterTest extends TestCase
 
     public function testNegative()
     {
-        $formatter = new \gugglegum\MemorySize\Formatter();
+        $formatter = new Formatter();
         $this->assertEquals('-1.21 KiB', $formatter->format(-1234));
         $this->assertEquals('-4.28 TiB', $formatter->format(-4707319808000)); // -1000 x DVD-R(W)
     }
@@ -114,54 +118,57 @@ class FormatterTest extends TestCase
     public function testSetOptions()
     {
         // Set all options through constructor (setFromArray) to non-default values
-        $formatter = new \gugglegum\MemorySize\Formatter([
-            'standard' => new \gugglegum\MemorySize\Standards\JEDEC(),
+        $formatter = new Formatter([
+            'standard' => new JEDEC(),
             'minDecimals' => 2,
             'maxDecimals' => 4,
-            'decimalPoint' => ',',
-            'thousandsSeparator' => ' ',
+            'numberFormat' => [
+                'decimalPoint' => ',',
+                'thousandsSeparator' => ' ',
+            ],
             'unitSeparator' => "\t",
         ]);
 
         // Check all options set correctly via getters
-        $this->assertInstanceOf(\gugglegum\MemorySize\Standards\JEDEC::class, $formatter->getOptions()->getStandard());
+        $this->assertInstanceOf(JEDEC::class, $formatter->getOptions()->getStandard());
         $this->assertEquals(2, $formatter->getOptions()->getMinDecimals());
         $this->assertEquals(4, $formatter->getOptions()->getMaxDecimals());
-        $this->assertEquals(',', $formatter->getOptions()->getDecimalPoint());
-        $this->assertEquals(' ', $formatter->getOptions()->getThousandsSeparator());
+        $this->assertEquals(',', $formatter->getOptions()->getNumberFormat()->getDecimalPoint());
+        $this->assertEquals(' ', $formatter->getOptions()->getNumberFormat()->getThousandsSeparator());
         $this->assertEquals("\t", $formatter->getOptions()->getUnitSeparator());
 
         // Change all previously defined options via setter methods on options instance
         $formatter->getOptions()
-            ->setStandard(new \gugglegum\MemorySize\Standards\IEC())
+            ->setStandard(new IEC())
             ->setMinDecimals(0)
             ->setMaxDecimals(2)
-            ->setDecimalPoint('.')
-            ->setThousandsSeparator(',')
+            ->setNumberFormat((new NumberFormat())
+                ->setDecimalPoint('.')
+                ->setThousandsSeparator(',')
+            )
             ->setUnitSeparator(' ');
 
         // Check once again that all set correctly
-        $this->assertInstanceOf(\gugglegum\MemorySize\Standards\IEC::class, $formatter->getOptions()->getStandard());
+        $this->assertInstanceOf(IEC::class, $formatter->getOptions()->getStandard());
         $this->assertEquals(0, $formatter->getOptions()->getMinDecimals());
         $this->assertEquals(2, $formatter->getOptions()->getMaxDecimals());
-        $this->assertEquals('.', $formatter->getOptions()->getDecimalPoint());
-        $this->assertEquals(',', $formatter->getOptions()->getThousandsSeparator());
+        $this->assertEquals('.', $formatter->getOptions()->getNumberFormat()->getDecimalPoint());
+        $this->assertEquals(',', $formatter->getOptions()->getNumberFormat()->getThousandsSeparator());
         $this->assertEquals(' ', $formatter->getOptions()->getUnitSeparator());
     }
 
     public function testExceptionOnUnknownOption1()
     {
-        $this->expectException(\gugglegum\MemorySize\Exception::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown memory-size formatter option "unknownOption"');
-        new \gugglegum\MemorySize\Formatter(['unknownOption' => 'value']);
+        new Formatter(['unknownOption' => 'value']);
     }
 
     public function testExceptionOnUnknownOption2()
     {
-        $this->expectException(\gugglegum\MemorySize\Exception::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown memory-size formatter option "unknownOption"');
-        $formatter = new \gugglegum\MemorySize\Formatter();
+        $formatter = new Formatter();
         $formatter->setOptions(['unknownOption' => 'value']);
     }
-
 }
