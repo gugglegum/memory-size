@@ -45,9 +45,9 @@ class NumberFormat
      *
      * @return NumberFormat
      */
-    public static function createDefault()
+    public static function createDefault(): NumberFormat
     {
-        return self::create(self::DEFAULT_DECIMAL_POINT, self::DEFAULT_THOUSANDS_SEPARATOR);
+        return self::create(self::DEFAULT_DECIMAL_POINT);
     }
 
     /**
@@ -57,7 +57,7 @@ class NumberFormat
      * @param string $thousandsSeparator
      * @return NumberFormat
      */
-    public static function create(string $decimalPoint, string $thousandsSeparator = self::DEFAULT_THOUSANDS_SEPARATOR)
+    public static function create(string $decimalPoint, string $thousandsSeparator = self::DEFAULT_THOUSANDS_SEPARATOR): NumberFormat
     {
         return (new self())
             ->setDecimalPoint($decimalPoint)

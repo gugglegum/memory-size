@@ -91,7 +91,7 @@ class Formatter
      * @param FormatterOptions $options
      * @return string
      */
-    private function formatNumber($number, FormatterOptions $options)
+    private function formatNumber($number, FormatterOptions $options): string
     {
         $formattedNumber = number_format(
             $number,

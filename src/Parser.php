@@ -48,7 +48,7 @@ class Parser
      *
      * @return StandardInterface[]
      */
-    public static function getDefaultStandards()
+    public static function getDefaultStandards(): array
     {
         return [
             new IEC(),
@@ -144,7 +144,7 @@ class Parser
 
             return [
                 'number' => $m[1],
-                'unit' => isset($m[2]) ? $m[2] : '',
+                'unit' => $m[2] ?? '',
             ];
         } else {
             throw new Exception('Failed to parse formatted memory size ("' . $formattedSize . '")');
