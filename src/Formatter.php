@@ -103,10 +103,10 @@ class Formatter
         $formattedNumberLength = strlen($formattedNumber);
         $stripMaxTrailingZeros = $options->getMaxDecimals() - $options->getMinDecimals();
         $i = 0;
-        while ($formattedNumber{$formattedNumberLength - $i - 1} === '0' && $i < $stripMaxTrailingZeros) {
+        while ($formattedNumber[$formattedNumberLength - $i - 1] === '0' && $i < $stripMaxTrailingZeros) {
             $i++;
         }
-        if ($formattedNumber{$formattedNumberLength - $i - 1} === $options->getNumberFormat()->getDecimalPoint()) {
+        if ($formattedNumber[$formattedNumberLength - $i - 1] === $options->getNumberFormat()->getDecimalPoint()) {
             $i++;
         }
         return (string) substr($formattedNumber, 0, $formattedNumberLength - $i);
